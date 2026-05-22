@@ -1,0 +1,101 @@
+<svg width="600" height="600" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGlow" cx="0.5" cy="0.5" r="0.55">
+      <stop stop-color="#d8aa5d" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#090807" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="nodeGold" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f0c979"/>
+      <stop offset="1" stop-color="#d8aa5d"/>
+    </linearGradient>
+    <filter id="nodeGlow"><feGaussianBlur stdDeviation="8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="softBlur"><feGaussianBlur stdDeviation="20"/></filter>
+  </defs>
+
+  <!-- Subtle background glow -->
+  <rect width="600" height="600" fill="url(#bgGlow)"/>
+
+  <!-- Network connections (data flow lines) -->
+  <line x1="300" y1="180" x2="160" y2="300" stroke="#d8aa5d" stroke-opacity="0.15" stroke-width="1"/>
+  <line x1="300" y1="180" x2="440" y2="300" stroke="#d8aa5d" stroke-opacity="0.15" stroke-width="1"/>
+  <line x1="300" y1="180" x2="300" y2="340" stroke="#d8aa5d" stroke-opacity="0.2" stroke-width="1.5"/>
+  <line x1="160" y1="300" x2="220" y2="440" stroke="#f6efe1" stroke-opacity="0.08" stroke-width="1"/>
+  <line x1="440" y1="300" x2="380" y2="440" stroke="#f6efe1" stroke-opacity="0.08" stroke-width="1"/>
+  <line x1="160" y1="300" x2="100" y2="420" stroke="#d8aa5d" stroke-opacity="0.1" stroke-width="1"/>
+  <line x1="440" y1="300" x2="500" y2="420" stroke="#d8aa5d" stroke-opacity="0.1" stroke-width="1"/>
+  <line x1="220" y1="440" x2="380" y2="440" stroke="#d8aa5d" stroke-opacity="0.12" stroke-width="1"/>
+  <line x1="300" y1="340" x2="220" y2="440" stroke="#f6efe1" stroke-opacity="0.06" stroke-width="1"/>
+  <line x1="300" y1="340" x2="380" y2="440" stroke="#f6efe1" stroke-opacity="0.06" stroke-width="1"/>
+
+  <!-- Orbital rings -->
+  <circle cx="300" cy="300" r="140" fill="none" stroke="#d8aa5d" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="8 12"/>
+  <circle cx="300" cy="300" r="200" fill="none" stroke="#f6efe1" stroke-opacity="0.05" stroke-width="1" stroke-dasharray="4 16"/>
+  <circle cx="300" cy="300" r="260" fill="none" stroke="#d8aa5d" stroke-opacity="0.04" stroke-width="1"/>
+
+  <!-- Central node: Data Hub -->
+  <circle cx="300" cy="300" r="42" fill="#d8aa5d" fill-opacity="0.08" filter="url(#softBlur)"/>
+  <circle cx="300" cy="300" r="28" fill="#141210" stroke="#d8aa5d" stroke-opacity="0.5" stroke-width="1.5"/>
+  <circle cx="300" cy="300" r="18" fill="url(#nodeGold)" fill-opacity="0.25" filter="url(#nodeGlow)"/>
+  <!-- Data icon in center -->
+  <rect x="292" y="290" width="4" height="18" rx="2" fill="#f0c979"/>
+  <rect x="300" y="295" width="4" height="13" rx="2" fill="#f0c979" fill-opacity="0.7"/>
+  <rect x="308" y="292" width="4" height="16" rx="2" fill="#f0c979" fill-opacity="0.85"/>
+
+  <!-- Top node: Python -->
+  <circle cx="300" cy="180" r="22" fill="#141210" stroke="#d8aa5d" stroke-opacity="0.4" stroke-width="1.5"/>
+  <circle cx="300" cy="180" r="14" fill="#d8aa5d" fill-opacity="0.15" filter="url(#nodeGlow)"/>
+  <text x="300" y="184" text-anchor="middle" fill="#f0c979" font-size="10" font-weight="700" font-family="DM Sans, system-ui">Py</text>
+  <text x="300" y="156" text-anchor="middle" fill="#f6efe1" fill-opacity="0.5" font-size="10" font-family="DM Sans, system-ui">Python</text>
+
+  <!-- Left node: Power BI -->
+  <circle cx="160" cy="300" r="22" fill="#141210" stroke="#f0c979" stroke-opacity="0.35" stroke-width="1.5"/>
+  <circle cx="160" cy="300" r="14" fill="#f0c979" fill-opacity="0.12" filter="url(#nodeGlow)"/>
+  <text x="160" y="304" text-anchor="middle" fill="#f0c979" font-size="8.5" font-weight="700" font-family="DM Sans, system-ui">PBI</text>
+  <text x="160" y="278" text-anchor="middle" fill="#f6efe1" fill-opacity="0.5" font-size="10" font-family="DM Sans, system-ui">Power BI</text>
+
+  <!-- Right node: SQL -->
+  <circle cx="440" cy="300" r="22" fill="#141210" stroke="#d8aa5d" stroke-opacity="0.35" stroke-width="1.5"/>
+  <circle cx="440" cy="300" r="14" fill="#d8aa5d" fill-opacity="0.12" filter="url(#nodeGlow)"/>
+  <text x="440" y="304" text-anchor="middle" fill="#f0c979" font-size="9" font-weight="700" font-family="DM Sans, system-ui">SQL</text>
+  <text x="440" y="278" text-anchor="middle" fill="#f6efe1" fill-opacity="0.5" font-size="10" font-family="DM Sans, system-ui">SQL</text>
+
+  <!-- Bottom-left node: ISO -->
+  <circle cx="220" cy="440" r="20" fill="#141210" stroke="#f6efe1" stroke-opacity="0.2" stroke-width="1.5"/>
+  <circle cx="220" cy="440" r="12" fill="#f6efe1" fill-opacity="0.08"/>
+  <text x="220" y="444" text-anchor="middle" fill="#f6efe1" fill-opacity="0.7" font-size="8" font-weight="700" font-family="DM Sans, system-ui">ISO</text>
+  <text x="220" y="468" text-anchor="middle" fill="#f6efe1" fill-opacity="0.4" font-size="9" font-family="DM Sans, system-ui">ISO 9001</text>
+
+  <!-- Bottom-right node: Excel -->
+  <circle cx="380" cy="440" r="20" fill="#141210" stroke="#f6efe1" stroke-opacity="0.2" stroke-width="1.5"/>
+  <circle cx="380" cy="440" r="12" fill="#f6efe1" fill-opacity="0.08"/>
+  <text x="380" y="444" text-anchor="middle" fill="#f6efe1" fill-opacity="0.7" font-size="7.5" font-weight="700" font-family="DM Sans, system-ui">XLS</text>
+  <text x="380" y="468" text-anchor="middle" fill="#f6efe1" fill-opacity="0.4" font-size="9" font-family="DM Sans, system-ui">Excel</text>
+
+  <!-- Far-left node: HAZOP -->
+  <circle cx="100" cy="420" r="16" fill="#141210" stroke="#d8aa5d" stroke-opacity="0.15" stroke-width="1"/>
+  <circle cx="100" cy="420" r="8" fill="#d8aa5d" fill-opacity="0.1"/>
+  <text x="100" y="446" text-anchor="middle" fill="#f6efe1" fill-opacity="0.35" font-size="9" font-family="DM Sans, system-ui">HAZOP</text>
+
+  <!-- Far-right node: BPM -->
+  <circle cx="500" cy="420" r="16" fill="#141210" stroke="#d8aa5d" stroke-opacity="0.15" stroke-width="1"/>
+  <circle cx="500" cy="420" r="8" fill="#d8aa5d" fill-opacity="0.1"/>
+  <text x="500" y="446" text-anchor="middle" fill="#f6efe1" fill-opacity="0.35" font-size="9" font-family="DM Sans, system-ui">BPM</text>
+
+  <!-- Floating data particles -->
+  <circle cx="240" cy="220" r="3" fill="#d8aa5d" fill-opacity="0.4"/>
+  <circle cx="370" cy="240" r="2.5" fill="#f0c979" fill-opacity="0.3"/>
+  <circle cx="200" cy="370" r="2" fill="#f6efe1" fill-opacity="0.2"/>
+  <circle cx="410" cy="370" r="2.5" fill="#d8aa5d" fill-opacity="0.3"/>
+  <circle cx="340" cy="380" r="1.5" fill="#f0c979" fill-opacity="0.25"/>
+  <circle cx="260" cy="350" r="2" fill="#f6efe1" fill-opacity="0.15"/>
+
+  <!-- Mini sparkline decoration top-right -->
+  <path d="M440 140 L460 130 L480 135 L500 118 L520 110" stroke="#d8aa5d" stroke-opacity="0.2" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <circle cx="520" cy="110" r="2.5" fill="#f0c979" fill-opacity="0.4"/>
+
+  <!-- Mini bars decoration bottom-left -->
+  <rect x="70" y="520" width="3" height="18" rx="1.5" fill="#d8aa5d" fill-opacity="0.15"/>
+  <rect x="78" y="525" width="3" height="13" rx="1.5" fill="#d8aa5d" fill-opacity="0.12"/>
+  <rect x="86" y="515" width="3" height="23" rx="1.5" fill="#d8aa5d" fill-opacity="0.2"/>
+  <rect x="94" y="522" width="3" height="16" rx="1.5" fill="#d8aa5d" fill-opacity="0.1"/>
+</svg>

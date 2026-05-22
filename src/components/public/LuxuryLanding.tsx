@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import {
   motion,
   MotionConfig,
@@ -26,6 +27,7 @@ import {
   ExternalLink,
   Menu,
   X,
+  Phone,
 } from "lucide-react"
 import { formatCOP } from "@/lib/utils"
 import ContactForm from "./ContactForm"
@@ -173,6 +175,10 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
           {/* ── Hero ────────────────────────────────────────────── */}
           <section className="lux-hero">
             <div className="lux-hero-bg" />
+            {/* Imperial SVG background */}
+            <div className="lux-hero-svg-bg" aria-hidden="true">
+              <Image src="/assets/imperial-hero.svg" alt="" fill style={{ objectFit: "cover", opacity: 0.35 }} priority />
+            </div>
             <motion.div
               className="lux-hero-orb"
               animate={{ rotate: 360 }}
@@ -184,51 +190,74 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
               transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
             />
 
-            <motion.p
-              className="lux-eyebrow"
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.2 }}
-            >
-              Analista de datos &bull; Inteligencia operativa
-            </motion.p>
+            <div className="lux-hero-content">
+              <div className="lux-hero-text">
+                <motion.p
+                  className="lux-eyebrow"
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{ delay: 0.2 }}
+                >
+                  Analista de datos &bull; Inteligencia operativa
+                </motion.p>
 
-            <motion.h1
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.35, duration: 0.8 }}
-            >
-              Transformo datos en <em>decisiones que elevan</em> tu negocio
-            </motion.h1>
+                <motion.h1
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{ delay: 0.35, duration: 0.8 }}
+                >
+                  Transformo datos en <em>decisiones que elevan</em> tu negocio
+                </motion.h1>
 
-            <motion.p
-              className="lux-hero-copy"
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.5 }}
-            >
-              Dashboards ejecutivos, automatización de procesos, consultoría de calidad ISO
-              y análisis predictivo para empresas que quieren crecer con datos reales.
-            </motion.p>
+                <motion.p
+                  className="lux-hero-copy"
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{ delay: 0.5 }}
+                >
+                  Dashboards ejecutivos, automatización de procesos, consultoría de calidad ISO
+                  y análisis predictivo para empresas que quieren crecer con datos reales.
+                </motion.p>
 
-            <motion.div
-              className="lux-hero-actions"
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.65 }}
-            >
-              <a href="#servicios" className="lux-btn lux-btn-primary">
-                Ver servicios
-                <ArrowRight size={18} />
-              </a>
-              <a href="#contacto" className="lux-btn lux-btn-secondary">
-                Solicitar cotización
-              </a>
-            </motion.div>
+                <motion.div
+                  className="lux-hero-actions"
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{ delay: 0.65 }}
+                >
+                  <a href="#servicios" className="lux-btn lux-btn-primary">
+                    Ver servicios
+                    <ArrowRight size={18} />
+                  </a>
+                  <a href="#contacto" className="lux-btn lux-btn-secondary">
+                    Solicitar cotización
+                  </a>
+                </motion.div>
+              </div>
+
+              {/* Dashboard mockup visual */}
+              <motion.div
+                className="lux-hero-visual"
+                variants={fadeScale}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.7, duration: 1 }}
+              >
+                <div className="lux-dashboard-wrap">
+                  <Image
+                    src="/assets/dashboard-mockup.svg"
+                    alt="Dashboard de análisis de datos ejecutivo con KPIs, gráficos de tendencia y distribución de servicios"
+                    width={800}
+                    height={560}
+                    priority
+                  />
+                </div>
+              </motion.div>
+            </div>
           </section>
 
           {/* ── Sobre mí ──────────────────────────────────────── */}
@@ -240,8 +269,23 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
             >
-              <motion.div variants={fadeUp}>
+              {/* Left column: Data viz visual */}
+              <motion.div variants={fadeUp} className="lux-about-left">
                 <span className="lux-about-kicker">Sobre mí</span>
+                <motion.div
+                  className="lux-about-visual"
+                  variants={fadeScale}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
+                >
+                  <Image
+                    src="/assets/data-viz.svg"
+                    alt="Red de competencias en análisis de datos: Python, Power BI, SQL, ISO 9001, Excel"
+                    width={600}
+                    height={600}
+                  />
+                </motion.div>
               </motion.div>
 
               <div>
@@ -290,7 +334,11 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
           </section>
 
           {/* ── Servicios ─────────────────────────────────────── */}
-          <section id="servicios" className="lux-section">
+          <section id="servicios" className="lux-section lux-services-section">
+            {/* Editorial background visual */}
+            <div className="lux-services-bg" aria-hidden="true">
+              <Image src="/assets/editorial-visual.svg" alt="" fill style={{ objectFit: "cover", opacity: 0.12 }} />
+            </div>
             <motion.div
               className="lux-section-heading"
               variants={fadeUp}
@@ -403,16 +451,19 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
         <footer className="lux-footer lux-section">
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
             <p>&copy; {new Date().getFullYear()} Johan Sebastián Barrera Bustos</p>
-            <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-              <a href="mailto:sebastian11201995@gmail.com" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <div className="lux-footer-links">
+              <a href="mailto:sebastian11201995@gmail.com">
                 <Mail size={16} />
                 sebastian11201995@gmail.com
+              </a>
+              <a href="tel:+573108356778">
+                <Phone size={16} />
+                +57 310 835 6778
               </a>
               <a
                 href="https://www.linkedin.com/in/tu-perfil"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
               >
                 <ExternalLink size={16} />
                 LinkedIn
