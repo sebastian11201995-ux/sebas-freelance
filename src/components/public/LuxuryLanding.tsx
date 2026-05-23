@@ -1,12 +1,14 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import Image from "next/image"
 import {
   motion,
   MotionConfig,
   useScroll,
   useTransform,
+  useSpring,
+  useInView,
   AnimatePresence,
 } from "motion/react"
 import {
@@ -19,7 +21,6 @@ import {
   Briefcase,
   ArrowRight,
   ArrowUpRight,
-  ChevronRight,
   Menu,
   X,
   Mail,
@@ -29,39 +30,92 @@ import {
 import { formatCOP } from "@/lib/utils"
 import ContactForm from "./ContactForm"
 
+/* ── Smooth spring config ─────────────────────────────────────── */
+const smoothSpring = { type: "spring" as const, stiffness: 80, damping: 25, mass: 0.8 }
+const snappySpring = { type: "spring" as const, stiffness: 120, damping: 20, mass: 0.6 }
+
 /* ── Animation variants ─────────────────────────────────────── */
 const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 60, filter: "blur(8px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: smoothSpring },
+}
+const fadeUpFast = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: snappySpring },
 }
 const stagger = {
-  visible: { transition: { staggerChildren: 0.12 } },
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
 }
-const fadeScale = {
-  hidden: { opacity: 0, scale: 0.94 },
-  visible: { opacity: 1, scale: 1 },
+const staggerSlow = {
+  visible: { transition: { staggerChildren: 0.15, delayChildren: 0.1 } },
 }
-const slideLeft = {
-  hidden: { opacity: 0, x: -60 },
-  visible: { opacity: 1, x: 0 },
+const scaleReveal = {
+  hidden: { opacity: 0, scale: 0.88, filter: "blur(12px)" },
+  visible: { opacity: 1, scale: 1, filter: "blur(0px)", transition: { ...smoothSpring, duration: 1.2 } },
 }
-const slideRight = {
-  hidden: { opacity: 0, x: 60 },
-  visible: { opacity: 1, x: 0 },
+const slideFromLeft = {
+  hidden: { opacity: 0, x: -80 },
+  visible: { opacity: 1, x: 0, transition: smoothSpring },
+}
+const slideFromRight = {
+  hidden: { opacity: 0, x: 80 },
+  visible: { opacity: 1, x: 0, transition: smoothSpring },
+}
+const cardReveal = {
+  hidden: { opacity: 0, y: 50, scale: 0.95 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: snappySpring },
+}
+
+/* ── Counter hook ───────────────────────────────────────────── */
+function useCounter(target: number, duration: number = 2000) {
+  const [count, setCount] = useState(0)
+  const ref = useRef<HTMLDivElement>(null)
+  const isInView = useInView(ref, { once: true, amount: 0.5 })
+  const hasAnimated = useRef(false)
+
+  useEffect(() => {
+    if (!isInView || hasAnimated.current) return
+    hasAnimated.current = true
+    const start = performance.now()
+    const step = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 4)
+      setCount(Math.round(eased * target))
+      if (progress < 1) requestAnimationFrame(step)
+    }
+    requestAnimationFrame(step)
+  }, [isInView, target, duration])
+
+  return { count, ref }
+}
+
+/* ── Parallax section ───────────────────────────────────────── */
+function ParallaxBg({ src, speed = 0.3, overlay = 0.7, children, className = "" }: {
+  src: string; speed?: number; overlay?: number; children?: React.ReactNode; className?: string
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] })
+  const y = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"])
+  const smoothY = useSpring(y, { stiffness: 50, damping: 30 })
+
+  return (
+    <div ref={ref} className={`ed-parallax-section ${className}`} style={{ position: "relative", overflow: "hidden" }}>
+      <motion.div className="ed-parallax-img" style={{ y: smoothY }}>
+        <Image src={src} alt="" fill style={{ objectFit: "cover" }} quality={85} sizes="100vw" />
+      </motion.div>
+      <div className="ed-parallax-overlay" style={{ background: `linear-gradient(180deg, rgba(9,8,7,${overlay}) 0%, rgba(9,8,7,${overlay * 0.85}) 40%, rgba(9,8,7,${overlay}) 100%)` }} />
+      {children}
+    </div>
+  )
 }
 
 /* ── Icon map ───────────────────────────────────────────────── */
 const iconMap: Record<string, React.ElementType> = {
-  "bar-chart-2": BarChart2,
-  "file-text": FileText,
-  "shield-check": ShieldCheck,
-  zap: Zap,
-  "alert-triangle": AlertTriangle,
-  "git-branch": GitBranch,
-  briefcase: Briefcase,
+  "bar-chart-2": BarChart2, "file-text": FileText, "shield-check": ShieldCheck,
+  zap: Zap, "alert-triangle": AlertTriangle, "git-branch": GitBranch, briefcase: Briefcase,
 }
 
-/* ── Marquee keywords ──────────────────────────────────────── */
+/* ── Data ───────────────────────────────────────────────────── */
 const marqueeWords = [
   "Power BI", "Python", "SQL", "Dashboards Ejecutivos", "ISO 9001",
   "Automatización", "Análisis Predictivo", "Excel Avanzado", "HAZOP",
@@ -69,31 +123,14 @@ const marqueeWords = [
   "KPIs Operativos", "ETL", "Reportes Automatizados", "Scikit-learn",
 ]
 
-/* ── Manifiesto columns ────────────────────────────────────── */
 const manifiesto = [
-  {
-    title: "Datos sin estrategia son ruido.",
-    body: "El 73% de los datos empresariales nunca se analizan. Cada tabla ignorada es una decisión a ciegas, una oportunidad perdida, un riesgo invisible.",
-  },
-  {
-    title: "La inteligencia no se compra, se construye.",
-    body: "No vendo dashboards bonitos. Construyo sistemas de decisión que conectan la realidad operativa con la acción directiva. Eso cambia resultados.",
-  },
-  {
-    title: "La calidad no es un trámite.",
-    body: "ISO, HAZOP, BPM — son marcos de pensamiento, no carpetas de auditores. Cuando los integro con datos, se convierten en ventaja competitiva real.",
-  },
-  {
-    title: "Tu operación merece claridad.",
-    body: "Cada proceso tiene una historia que contar. Mi trabajo es traducir esa historia en números que cualquier directivo entienda y pueda usar mañana.",
-  },
-  {
-    title: "Resultados, no entregables.",
-    body: "El éxito no es un PDF de 50 páginas. Es la llamada donde tu gerente dice: 'Ahora sí veo dónde estamos parados.' Eso es lo que entrego.",
-  },
+  { title: "Datos sin estrategia son ruido.", body: "El 73% de los datos empresariales nunca se analizan. Cada tabla ignorada es una decisión a ciegas, una oportunidad perdida." },
+  { title: "La inteligencia no se compra, se construye.", body: "No vendo dashboards bonitos. Construyo sistemas de decisión que conectan la realidad operativa con la acción directiva." },
+  { title: "La calidad no es un trámite.", body: "ISO, HAZOP, BPM — son marcos de pensamiento. Cuando los integro con datos, se convierten en ventaja competitiva real." },
+  { title: "Tu operación merece claridad.", body: "Cada proceso tiene una historia que contar. Mi trabajo es traducir esa historia en números que cualquier directivo entienda." },
+  { title: "Resultados, no entregables.", body: "El éxito no es un PDF de 50 páginas. Es la llamada donde tu gerente dice: 'Ahora sí veo dónde estamos parados.'" },
 ]
 
-/* ── Process steps ──────────────────────────────────────────── */
 const steps = [
   { num: "01", title: "Inmersión", desc: "Me sumerjo en tu operación, entiendo tus datos, tus dolores y tus objetivos reales de negocio." },
   { num: "02", title: "Diagnóstico", desc: "Audito tus fuentes de datos, identifico brechas y diseño la arquitectura de la solución." },
@@ -102,34 +139,42 @@ const steps = [
   { num: "05", title: "Transferencia", desc: "Entrega final con capacitación, soporte post-entrega y acompañamiento por 15 días." },
 ]
 
-/* ── Stats ───────────────────────────────────────────────────── */
-const stats = [
-  { value: "5+", label: "Años en datos e industria" },
-  { value: "30+", label: "Proyectos entregados" },
-  { value: "100%", label: "Clientes satisfechos" },
-  { value: "94%", label: "Eficiencia promedio lograda" },
+const statsData = [
+  { value: 5, suffix: "+", label: "Años en datos e industria" },
+  { value: 30, suffix: "+", label: "Proyectos entregados" },
+  { value: 100, suffix: "%", label: "Clientes satisfechos" },
+  { value: 94, suffix: "%", label: "Eficiencia promedio lograda" },
 ]
 
-/* ── Types ───────────────────────────────────────────────────── */
-interface Service {
-  id: string
-  name: string
-  description: string
-  price_from: number
-  icon: string
+/* ── Stat Counter Component ──────────────────────────────────── */
+function StatCounter({ value, suffix, label }: { value: number; suffix: string; label: string }) {
+  const { count, ref } = useCounter(value, 2200)
+  return (
+    <motion.div ref={ref} className="ed-stat" variants={cardReveal} whileHover={{ y: -6, borderColor: "rgba(216,170,93,.4)", transition: { duration: 0.25 } }}>
+      <strong>{count}{suffix}</strong>
+      <span>{label}</span>
+    </motion.div>
+  )
 }
 
-interface LuxuryLandingProps {
-  services: Service[]
-}
+/* ── Types ───────────────────────────────────────────────────── */
+interface Service { id: string; name: string; description: string; price_from: number; icon: string }
+interface LuxuryLandingProps { services: Service[] }
 
 /* ══════════════════════════════════════════════════════════════ */
 export default function LuxuryLanding({ services }: LuxuryLandingProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { scrollYProgress } = useScroll()
-  const progressScale = useTransform(scrollYProgress, [0, 1], [0, 1])
-  const marqueeRef = useRef<HTMLDivElement>(null)
+  const progressScale = useSpring(useTransform(scrollYProgress, [0, 1], [0, 1]), { stiffness: 100, damping: 30 })
+
+  // Hero parallax
+  const heroRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress: heroProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] })
+  const heroImgY = useTransform(heroProgress, [0, 1], ["0%", "30%"])
+  const heroContentY = useTransform(heroProgress, [0, 1], ["0%", "15%"])
+  const heroOpacity = useTransform(heroProgress, [0, 0.8], [1, 0])
+  const smoothHeroImgY = useSpring(heroImgY, { stiffness: 40, damping: 25 })
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 60)
@@ -153,13 +198,18 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
   const romanNumerals = ["I", "II", "III", "IV", "V", "VI"]
 
   return (
-    <MotionConfig transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}>
+    <MotionConfig transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}>
       <div className="ed-shell">
         {/* ── Scroll Progress ──────────────────────────────────── */}
         <motion.div className="ed-progress" style={{ scaleX: progressScale }} />
 
         {/* ── Nav ──────────────────────────────────────────────── */}
-        <nav className={`ed-nav ${scrolled ? "ed-nav--scrolled" : ""}`}>
+        <motion.nav
+          className={`ed-nav ${scrolled ? "ed-nav--scrolled" : ""}`}
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, ...smoothSpring }}
+        >
           <a href="#" className="ed-brand">
             <span className="ed-brand-mark">SB</span>
             <strong>Sebastián Barrera</strong>
@@ -173,14 +223,10 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
             <span className="ed-cta-dot" />
             Consulta gratuita
           </a>
-          <button
-            className="ed-menu-btn"
-            onClick={() => setMenuOpen(true)}
-            aria-label="Abrir menú"
-          >
+          <button className="ed-menu-btn" onClick={() => setMenuOpen(true)} aria-label="Abrir menú">
             <Menu size={22} />
           </button>
-        </nav>
+        </motion.nav>
 
         {/* ── Mobile Panel ────────────────────────────────────── */}
         <AnimatePresence>
@@ -193,22 +239,15 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
               transition={{ duration: 0.3 }}
             >
               <div className="ed-mobile-inner">
-                <button
-                  className="ed-mobile-close"
-                  onClick={() => setMenuOpen(false)}
-                  aria-label="Cerrar menú"
-                >
+                <button className="ed-mobile-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú">
                   <X size={24} />
                 </button>
                 <div className="ed-mobile-links">
                   {navLinks.map((l, i) => (
                     <motion.a
-                      key={l.href}
-                      href={l.href}
-                      onClick={() => setMenuOpen(false)}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 + i * 0.06 }}
+                      key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
+                      initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.08 + i * 0.06, ...snappySpring }}
                     >
                       <span className="ed-mobile-num">0{i + 1}</span>
                       {l.label}
@@ -216,8 +255,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
                   ))}
                 </div>
                 <a href="#contacto" className="ed-nav-cta ed-mobile-cta" onClick={() => setMenuOpen(false)}>
-                  <span className="ed-cta-dot" />
-                  Consulta gratuita
+                  <span className="ed-cta-dot" /> Consulta gratuita
                 </a>
               </div>
             </motion.div>
@@ -226,19 +264,14 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
 
         <main className="ed-main">
           {/* ═══ HERO ════════════════════════════════════════════ */}
-          <section className="ed-hero">
-            <div className="ed-hero-bg">
-              <Image src="/assets/imperial-hero.svg" alt="" fill style={{ objectFit: "cover", opacity: 0.3 }} priority />
-              <div className="ed-hero-gradient" />
-            </div>
+          <section className="ed-hero" ref={heroRef}>
+            <motion.div className="ed-hero-bg" style={{ y: smoothHeroImgY }}>
+              <Image src="/assets/hero-office.png" alt="" fill style={{ objectFit: "cover" }} priority quality={90} sizes="100vw" />
+            </motion.div>
+            <div className="ed-hero-gradient" />
 
-            <div className="ed-hero-inner">
-              <motion.div
-                className="ed-hero-content"
-                initial="hidden"
-                animate="visible"
-                variants={stagger}
-              >
+            <motion.div className="ed-hero-inner" style={{ y: heroContentY, opacity: heroOpacity }}>
+              <motion.div className="ed-hero-content" initial="hidden" animate="visible" variants={stagger}>
                 <motion.p className="ed-tag" variants={fadeUp}>
                   Analista de datos &bull; Consultor freelance &bull; Bogotá
                 </motion.p>
@@ -255,8 +288,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
 
                 <motion.div className="ed-hero-actions" variants={fadeUp}>
                   <a href="#contacto" className="ed-btn ed-btn-gold">
-                    Iniciar proyecto
-                    <ArrowRight size={18} />
+                    Iniciar proyecto <ArrowRight size={18} />
                   </a>
                   <a href="#servicios" className="ed-btn ed-btn-ghost">
                     Ver servicios
@@ -264,32 +296,31 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
                 </motion.div>
               </motion.div>
 
-              {/* Dashboard visual */}
+              {/* Dashboard visual with floating animation */}
               <motion.div
                 className="ed-hero-visual"
-                variants={fadeScale}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.5, duration: 1.1 }}
+                initial={{ opacity: 0, scale: 0.85, y: 40 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
               >
-                <div className="ed-dashboard-frame">
+                <motion.div
+                  className="ed-dashboard-frame"
+                  animate={{ y: [0, -12, 0] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                >
                   <Image
-                    src="/assets/dashboard-mockup.svg"
-                    alt="Dashboard ejecutivo de análisis de datos con KPIs, gráficos de tendencia y distribución de servicios"
-                    width={800}
-                    height={560}
-                    priority
+                    src="/assets/dashboard-photo.png"
+                    alt="Dashboard ejecutivo de análisis de datos"
+                    width={800} height={560} priority
                   />
-                </div>
+                </motion.div>
               </motion.div>
-            </div>
+            </motion.div>
 
-            {/* Scroll hint */}
             <motion.div
               className="ed-scroll-hint"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.5 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              transition={{ delay: 2 }}
             >
               <div className="ed-scroll-line" />
               <span>Scroll</span>
@@ -298,207 +329,136 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
 
           {/* ═══ MARQUEE ═════════════════════════════════════════ */}
           <div className="ed-marquee-section">
-            <div className="ed-marquee-track" ref={marqueeRef}>
+            <div className="ed-marquee-track">
               {[...marqueeWords, ...marqueeWords].map((word, i) => (
                 <span key={i} className="ed-marquee-word">
-                  {word}
-                  <span className="ed-marquee-sep">&mdash;</span>
+                  {word}<span className="ed-marquee-sep">&mdash;</span>
                 </span>
               ))}
             </div>
           </div>
 
           {/* ═══ 001 MANIFIESTO ══════════════════════════════════ */}
-          <section id="manifiesto" className="ed-section ed-manifiesto">
-            <motion.div
-              className="ed-section-label"
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-            >
-              <span className="ed-num">001</span>
-              <span className="ed-label-text">Manifiesto</span>
-              <div className="ed-label-line" />
-            </motion.div>
+          <ParallaxBg src="/assets/glass-office.png" speed={0.3} overlay={0.88}>
+            <section id="manifiesto" className="ed-section ed-manifiesto" style={{ position: "relative", zIndex: 2 }}>
+              <motion.div className="ed-section-label" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+                <span className="ed-num">001</span>
+                <span className="ed-label-text">Manifiesto</span>
+                <div className="ed-label-line" />
+              </motion.div>
 
-            <motion.h2
-              className="ed-section-title"
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-            >
-              Lo que creo.<br />Lo que defiendo.
-            </motion.h2>
+              <motion.h2 className="ed-section-title" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+                Lo que creo.<br />Lo que defiendo.
+              </motion.h2>
 
-            <motion.div
-              className="ed-manifiesto-grid"
-              variants={stagger}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.1 }}
-            >
-              {manifiesto.map((item, i) => (
-                <motion.div key={i} className="ed-manifiesto-col" variants={fadeUp}>
-                  <span className="ed-manifiesto-num">{String(i + 1).padStart(2, "0")}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-          </section>
+              <motion.div className="ed-manifiesto-grid" variants={staggerSlow} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }}>
+                {manifiesto.map((item, i) => (
+                  <motion.div key={i} className="ed-manifiesto-col" variants={cardReveal}>
+                    <span className="ed-manifiesto-num">{String(i + 1).padStart(2, "0")}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.body}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </section>
+          </ParallaxBg>
 
           {/* ═══ 02 MÉTODO ═══════════════════════════════════════ */}
           <section id="metodo" className="ed-section ed-metodo">
-            <motion.div
-              className="ed-section-label"
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-            >
+            <motion.div className="ed-section-label" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
               <span className="ed-num">02</span>
               <span className="ed-label-text">Método</span>
               <div className="ed-label-line" />
             </motion.div>
 
             <div className="ed-metodo-layout">
-              <motion.div
-                className="ed-metodo-text"
-                variants={stagger}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.15 }}
-              >
+              <motion.div className="ed-metodo-text" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }}>
                 <motion.h2 className="ed-section-title" variants={fadeUp}>
                   Cinco pasos.<br />Cero improvisación.
                 </motion.h2>
 
                 <div className="ed-steps-list">
                   {steps.map((step, i) => (
-                    <motion.div key={step.num} className="ed-step" variants={fadeUp}>
+                    <motion.div
+                      key={step.num} className="ed-step" variants={fadeUpFast}
+                      whileHover={{ x: 8, transition: { duration: 0.2 } }}
+                    >
                       <div className="ed-step-num">{step.num}</div>
                       <div className="ed-step-content">
                         <h3>{step.title}</h3>
                         <p>{step.desc}</p>
                       </div>
-                      {i < steps.length - 1 && <div className="ed-step-connector" />}
                     </motion.div>
                   ))}
                 </div>
               </motion.div>
 
-              {/* Data Viz visual */}
-              <motion.div
-                className="ed-metodo-visual"
-                variants={slideRight}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
-              >
+              <motion.div className="ed-metodo-visual" variants={scaleReveal} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
                 <div className="ed-viz-frame">
-                  <Image
-                    src="/assets/data-viz.svg"
-                    alt="Red de competencias: Python, Power BI, SQL, ISO 9001, Excel, HAZOP, BPM"
-                    width={600}
-                    height={600}
-                  />
+                  <Image src="/assets/boardroom.png" alt="Reunión de equipo ejecutivo" width={700} height={500} style={{ borderRadius: 20 }} />
                 </div>
               </motion.div>
             </div>
           </section>
 
           {/* ═══ 03 SERVICIOS ════════════════════════════════════ */}
-          <section id="servicios" className="ed-section ed-servicios">
-            <div className="ed-services-bg" aria-hidden="true">
-              <Image src="/assets/editorial-visual.svg" alt="" fill style={{ objectFit: "cover", opacity: 0.1 }} />
-            </div>
+          <ParallaxBg src="/assets/blueprints.png" speed={0.25} overlay={0.92}>
+            <section id="servicios" className="ed-section ed-servicios" style={{ position: "relative", zIndex: 2 }}>
+              <motion.div className="ed-section-label" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+                <span className="ed-num">03</span>
+                <span className="ed-label-text">Servicios</span>
+                <div className="ed-label-line" />
+              </motion.div>
 
-            <motion.div
-              className="ed-section-label"
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-            >
-              <span className="ed-num">03</span>
-              <span className="ed-label-text">Servicios</span>
-              <div className="ed-label-line" />
-            </motion.div>
+              <motion.h2 className="ed-section-title" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+                Soluciones que transforman<br />operaciones reales.
+              </motion.h2>
 
-            <motion.h2
-              className="ed-section-title"
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-            >
-              Soluciones que transforman<br />operaciones reales.
-            </motion.h2>
-
-            <motion.div
-              className="ed-services-grid"
-              variants={stagger}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.1 }}
-            >
-              {services.map((service, i) => {
-                const Icon = iconMap[service.icon] ?? Briefcase
-                return (
-                  <motion.div key={service.id} className="ed-service-card" variants={fadeUp}>
-                    <div className="ed-service-header">
-                      <span className="ed-service-roman">{romanNumerals[i] || romanNumerals[0]}</span>
-                      <div className="ed-service-icon">
-                        <Icon size={20} />
+              <motion.div className="ed-services-grid" variants={staggerSlow} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.05 }}>
+                {services.map((service, i) => {
+                  const Icon = iconMap[service.icon] ?? Briefcase
+                  return (
+                    <motion.div
+                      key={service.id} className="ed-service-card" variants={cardReveal}
+                      whileHover={{ y: -14, borderColor: "rgba(216,170,93,.4)", transition: { type: "spring", stiffness: 300, damping: 20 } }}
+                    >
+                      <div className="ed-service-header">
+                        <span className="ed-service-roman">{romanNumerals[i] || romanNumerals[0]}</span>
+                        <motion.div className="ed-service-icon" whileHover={{ rotate: 15, scale: 1.15 }} transition={{ type: "spring", stiffness: 300 }}>
+                          <Icon size={20} />
+                        </motion.div>
                       </div>
-                    </div>
-                    <h3>{service.name}</h3>
-                    <p>{service.description}</p>
-                    <div className="ed-service-footer">
-                      <span className="ed-service-price">
-                        Desde {formatCOP(service.price_from)}
-                      </span>
-                      <a href="#contacto" className="ed-service-cta">
-                        Solicitar
-                        <ArrowUpRight size={16} />
-                      </a>
-                    </div>
-                  </motion.div>
-                )
-              })}
-            </motion.div>
+                      <h3>{service.name}</h3>
+                      <p>{service.description}</p>
+                      <div className="ed-service-footer">
+                        <span className="ed-service-price">Desde {formatCOP(service.price_from)}</span>
+                        <a href="#contacto" className="ed-service-cta">
+                          Solicitar <ArrowUpRight size={16} />
+                        </a>
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </motion.div>
 
-            {services.length === 0 && (
-              <p style={{ textAlign: "center", color: "var(--lux-muted)", marginTop: 40 }}>
-                Los servicios se cargarán cuando Supabase esté configurado.
-              </p>
-            )}
-          </section>
+              {services.length === 0 && (
+                <p style={{ textAlign: "center", color: "var(--lux-muted)", marginTop: 40 }}>
+                  Los servicios se cargarán cuando Supabase esté configurado.
+                </p>
+              )}
+            </section>
+          </ParallaxBg>
 
           {/* ═══ 04 SOBRE MÍ ════════════════════════════════════ */}
           <section id="sobre-mi" className="ed-section ed-about">
-            <motion.div
-              className="ed-section-label"
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-            >
+            <motion.div className="ed-section-label" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
               <span className="ed-num">04</span>
               <span className="ed-label-text">Sobre mí</span>
               <div className="ed-label-line" />
             </motion.div>
 
             <div className="ed-about-layout">
-              <motion.div
-                className="ed-about-text"
-                variants={stagger}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.15 }}
-              >
+              <motion.div className="ed-about-text" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }}>
                 <motion.h2 className="ed-section-title" variants={fadeUp}>
                   Ingeniero químico<br />con visión de datos.
                 </motion.h2>
@@ -513,143 +473,87 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
                   que los datos bien usados cambian resultados.
                 </motion.p>
 
-                {/* Stats row */}
-                <motion.div
-                  className="ed-stats-row"
-                  variants={stagger}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.3 }}
-                >
-                  {stats.map((s, i) => (
-                    <motion.div key={i} className="ed-stat" variants={fadeUp}>
-                      <strong>{s.value}</strong>
-                      <span>{s.label}</span>
-                    </motion.div>
+                <motion.div className="ed-stats-row" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+                  {statsData.map((s, i) => (
+                    <StatCounter key={i} value={s.value} suffix={s.suffix} label={s.label} />
                   ))}
                 </motion.div>
               </motion.div>
 
-              {/* Dashboard visual in about section */}
-              <motion.div
-                className="ed-about-visual"
-                variants={slideRight}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
-              >
+              <motion.div className="ed-about-visual" variants={scaleReveal} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
                 <div className="ed-about-dashboard">
-                  <Image
-                    src="/assets/dashboard-mockup.svg"
-                    alt="Dashboard profesional de análisis de datos"
-                    width={800}
-                    height={560}
-                  />
-                </div>
-                <div className="ed-about-dataviz">
-                  <Image
-                    src="/assets/data-viz.svg"
-                    alt="Red de herramientas de análisis"
-                    width={600}
-                    height={600}
-                  />
+                  <Image src="/assets/fitness-terrace.png" alt="Estilo de vida profesional" width={800} height={560} style={{ borderRadius: 20 }} />
                 </div>
               </motion.div>
             </div>
           </section>
 
-          {/* ═══ 05 RESULTADOS (cinematic break) ════════════════ */}
-          <section className="ed-section ed-results">
-            <div className="ed-results-bg">
-              <Image src="/assets/imperial-hero.svg" alt="" fill style={{ objectFit: "cover", opacity: 0.25 }} />
-              <div className="ed-results-overlay" />
-            </div>
+          {/* ═══ 05 RESULTS (cinematic break) ════════════════════ */}
+          <ParallaxBg src="/assets/penthouse.png" speed={0.4} overlay={0.6} className="ed-results-wrap">
+            <section className="ed-section ed-results" style={{ position: "relative", zIndex: 2 }}>
+              <motion.div className="ed-results-content" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+                <motion.div className="ed-section-label ed-section-label--light" variants={fadeUp}>
+                  <span className="ed-num">05</span>
+                  <span className="ed-label-text">Resultados</span>
+                </motion.div>
 
-            <motion.div
-              className="ed-results-content"
-              variants={stagger}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-            >
-              <motion.div className="ed-section-label ed-section-label--light" variants={fadeUp}>
-                <span className="ed-num">05</span>
-                <span className="ed-label-text">Resultados</span>
+                <motion.h2 className="ed-results-title" variants={fadeUp}>
+                  No es improvisar.
+                </motion.h2>
+                <motion.h2 className="ed-results-title ed-results-title--gold" variants={fadeUp}>
+                  Es decidir con datos.
+                </motion.h2>
+                <motion.p className="ed-results-copy" variants={fadeUp}>
+                  Cada dashboard, cada automatización, cada sistema de calidad que construyo
+                  tiene un solo propósito: que tu equipo deje de adivinar y empiece a decidir.
+                  Resultados medibles, impacto real, cero humo.
+                </motion.p>
+                <motion.a
+                  href="#contacto" className="ed-btn ed-btn-gold"
+                  variants={fadeUp}
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 60px rgba(216,170,93,.35)" }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  Hablemos de tu proyecto <ArrowRight size={18} />
+                </motion.a>
               </motion.div>
-
-              <motion.h2 className="ed-results-title" variants={fadeUp}>
-                No es improvisar.
-              </motion.h2>
-              <motion.h2 className="ed-results-title ed-results-title--gold" variants={fadeUp}>
-                Es decidir con datos.
-              </motion.h2>
-              <motion.p className="ed-results-copy" variants={fadeUp}>
-                Cada dashboard, cada automatización, cada sistema de calidad que construyo
-                tiene un solo propósito: que tu equipo deje de adivinar y empiece a decidir.
-                Resultados medibles, impacto real, cero humo.
-              </motion.p>
-              <motion.a href="#contacto" className="ed-btn ed-btn-gold" variants={fadeUp}>
-                Hablemos de tu proyecto
-                <ArrowRight size={18} />
-              </motion.a>
-            </motion.div>
-          </section>
+            </section>
+          </ParallaxBg>
 
           {/* ═══ CONTACTO ════════════════════════════════════════ */}
-          <section id="contacto" className="ed-section ed-contact">
-            <motion.div
-              className="ed-section-label"
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-            >
-              <span className="ed-num">06</span>
-              <span className="ed-label-text">Contacto</span>
-              <div className="ed-label-line" />
-            </motion.div>
+          <ParallaxBg src="/assets/luxury-hall.png" speed={0.2} overlay={0.85}>
+            <section id="contacto" className="ed-section ed-contact" style={{ position: "relative", zIndex: 2 }}>
+              <motion.div className="ed-section-label" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+                <span className="ed-num">06</span>
+                <span className="ed-label-text">Contacto</span>
+                <div className="ed-label-line" />
+              </motion.div>
 
-            <div className="ed-contact-layout">
-              <motion.div
-                className="ed-contact-text"
-                variants={stagger}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
-              >
-                <motion.h2 className="ed-section-title" variants={fadeUp}>
-                  Hablemos de tu<br />próximo proyecto.
-                </motion.h2>
-                <motion.p className="ed-contact-sub" variants={fadeUp}>
-                  Completa el formulario y te respondo en menos de 24 horas
-                  con una propuesta personalizada. Sin compromiso.
-                </motion.p>
-
-                <motion.div className="ed-contact-info" variants={fadeUp}>
-                  <a href="mailto:sebastian11201995@gmail.com">
-                    <Mail size={18} />
-                    sebastian11201995@gmail.com
-                  </a>
-                  <a href="tel:+573108356778">
-                    <Phone size={18} />
-                    +57 310 835 6778
-                  </a>
+              <div className="ed-contact-layout">
+                <motion.div className="ed-contact-text" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
+                  <motion.h2 className="ed-section-title" variants={fadeUp}>
+                    Hablemos de tu<br />próximo proyecto.
+                  </motion.h2>
+                  <motion.p className="ed-contact-sub" variants={fadeUp}>
+                    Completa el formulario y te respondo en menos de 24 horas
+                    con una propuesta personalizada. Sin compromiso.
+                  </motion.p>
+                  <motion.div className="ed-contact-info" variants={fadeUp}>
+                    <a href="mailto:sebastian11201995@gmail.com"><Mail size={18} /> sebastian11201995@gmail.com</a>
+                    <a href="tel:+573108356778"><Phone size={18} /> +57 310 835 6778</a>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
 
-              <motion.div
-                className="ed-contact-form-wrap"
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.1 }}
-              >
-                <ContactForm
-                  services={services.map(s => ({ id: s.id, name: s.name }))}
-                />
-              </motion.div>
-            </div>
-          </section>
+                <motion.div
+                  className="ed-contact-form-wrap"
+                  variants={slideFromRight} initial="hidden" whileInView="visible"
+                  viewport={{ once: true, amount: 0.1 }}
+                >
+                  <ContactForm services={services.map(s => ({ id: s.id, name: s.name }))} />
+                </motion.div>
+              </div>
+            </section>
+          </ParallaxBg>
         </main>
 
         {/* ── Footer ──────────────────────────────────────────── */}
@@ -662,29 +566,15 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
                 <span>Analista de datos & Consultor freelance</span>
               </div>
             </div>
-
             <div className="ed-footer-links">
-              {navLinks.map(l => (
-                <a key={l.href} href={l.href}>{l.label}</a>
-              ))}
+              {navLinks.map(l => (<a key={l.href} href={l.href}>{l.label}</a>))}
             </div>
-
             <div className="ed-footer-contact">
-              <a href="mailto:sebastian11201995@gmail.com">
-                <Mail size={15} />
-                Email
-              </a>
-              <a href="tel:+573108356778">
-                <Phone size={15} />
-                Teléfono
-              </a>
-              <a href="https://www.linkedin.com/in/tu-perfil" target="_blank" rel="noopener noreferrer">
-                <ExternalLink size={15} />
-                LinkedIn
-              </a>
+              <a href="mailto:sebastian11201995@gmail.com"><Mail size={15} /> Email</a>
+              <a href="tel:+573108356778"><Phone size={15} /> Teléfono</a>
+              <a href="https://www.linkedin.com/in/tu-perfil" target="_blank" rel="noopener noreferrer"><ExternalLink size={15} /> LinkedIn</a>
             </div>
           </div>
-
           <div className="ed-footer-bottom">
             <p>&copy; {new Date().getFullYear()} Johan Sebastián Barrera Bustos. Todos los derechos reservados.</p>
           </div>

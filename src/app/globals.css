@@ -1020,6 +1020,105 @@ button { font: inherit; }
   .ed-mobile-inner { padding: 80px 24px 32px; }
 }
 
+/* ══════════════════════════════════════════════════════════════
+   PARALLAX BACKGROUNDS
+   ══════════════════════════════════════════════════════════════ */
+.ed-parallax-section {
+  position: relative;
+  overflow: hidden;
+}
+.ed-parallax-img {
+  position: absolute;
+  inset: -20% 0;
+  z-index: 0;
+  will-change: transform;
+}
+.ed-parallax-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ed-parallax-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.ed-parallax-section .ed-section {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Enhanced hero bg for photos ──────────────────────────── */
+.ed-hero-bg {
+  position: absolute;
+  inset: -20% 0 0 0;
+  z-index: -1;
+  will-change: transform;
+}
+.ed-hero-gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 35% 45%, rgba(216, 170, 93, .15), transparent 40rem),
+    linear-gradient(180deg, rgba(9,8,7,.3) 0%, rgba(9,8,7,.2) 40%, rgba(9,8,7,.85) 80%, var(--lux-bg) 100%);
+}
+
+/* ── Results wrap ─────────────────────────────────────────── */
+.ed-results-wrap {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+.ed-results-wrap .ed-results {
+  padding: clamp(5rem, 12vw, 10rem) 0;
+}
+
+/* ── Glassmorphism contact form ───────────────────────────── */
+.ed-contact-form-wrap {
+  background: rgba(246, 239, 225, .04) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(246, 239, 225, .1) !important;
+  box-shadow: 0 32px 80px rgba(0,0,0,.3) !important;
+}
+
+/* ── Smoother stat cards ──────────────────────────────────── */
+.ed-stat {
+  transition: transform 300ms var(--lux-ease), border-color 300ms var(--lux-ease), box-shadow 300ms var(--lux-ease);
+}
+.ed-stat:hover {
+  box-shadow: 0 12px 40px rgba(216, 170, 93, .12);
+}
+
+/* ── Service card glow on hover ───────────────────────────── */
+.ed-service-card {
+  transition: transform 400ms var(--lux-spring), border-color 300ms var(--lux-ease), box-shadow 400ms var(--lux-ease);
+}
+.ed-service-card:hover {
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, .3),
+    0 0 40px rgba(216, 170, 93, .08);
+}
+
+/* ── Metodo visual photo ──────────────────────────────────── */
+.ed-viz-frame img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 20px;
+  border: 1px solid rgba(216, 170, 93, .12);
+  box-shadow: var(--lux-shadow-soft);
+}
+
+/* ── About visual photo ───────────────────────────────────── */
+.ed-about-dashboard img {
+  border-radius: 20px;
+  border: 1px solid rgba(216, 170, 93, .12);
+  box-shadow: var(--lux-shadow-soft);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
