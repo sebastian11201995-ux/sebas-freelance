@@ -594,7 +594,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
 
         {/* Floating WhatsApp Badge */}
         <motion.a
-          href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "573108356778"}?text=Hola%20Sebasti%C3%A1n,%20estoy%20interesado%20en%20tus%20servicios%20de%20consultor%C3%ADa%20y%20datos.`}
+          href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "573108356778"}?text=Hola%20Ing.%20Sebasti%C3%A1n%20Barrera,%20visit%C3%A9%20su%20sitio%20web%20y%20me%20gustar%C3%ADa%20solicitar%20informaci%C3%B3n%20sobre%20sus%20servicios%20de%20consultor%C3%ADa%20en%20anal%C3%ADtica%20de%20datos%20y%20optimizaci%C3%B3n%20de%20procesos.%20Saludos.`}
           target="_blank"
           rel="noopener noreferrer"
           className="ed-whatsapp-float"

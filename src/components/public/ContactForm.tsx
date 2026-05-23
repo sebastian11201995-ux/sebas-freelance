@@ -21,7 +21,7 @@ export default function ContactForm({ services, preselectedService }: ContactFor
   const [errors, setErrors] = useState<Partial<Record<keyof ContactFormData, string>>>({})
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
   const [serverError, setServerError] = useState("")
-  const [submittedData, setSubmittedData] = useState<{ name: string; service: string } | null>(null)
+  const [submittedData, setSubmittedData] = useState<{ name: string; service: string; company?: string } | null>(null)
 
   function validateField(field: keyof ContactFormData) {
     const result = contactSchema.shape[field].safeParse(form[field])
@@ -69,7 +69,7 @@ export default function ContactForm({ services, preselectedService }: ContactFor
     const result = await submitContact(parsed.data)
 
     if (result.success) {
-      setSubmittedData({ name: form.name, service: form.service_interest || "" })
+      setSubmittedData({ name: form.name, service: form.service_interest || "", company: form.company })
       setStatus("success")
       setForm({ name: "", email: "", company: "", service_interest: "", message: "" })
       setErrors({})
@@ -81,12 +81,11 @@ export default function ContactForm({ services, preselectedService }: ContactFor
 
   if (status === "success") {
     const whatsappPhone = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "573108356778"
-    const serviceName = submittedData?.service || "tus servicios"
+    const serviceName = submittedData?.service || "Consultoría General"
     const clientName = submittedData?.name || ""
-    const customMessage = encodeURIComponent(
-      `Hola Sebastián, acabo de enviarte una solicitud en tu web para el servicio de "${serviceName}". Mi nombre es ${clientName} y me gustaría agilizar el contacto.`
-    )
-    const whatsappUrl = `https://wa.me/${whatsappPhone}?text=${customMessage}`
+    const companyName = submittedData?.company ? ` de la empresa *${submittedData.company}*` : ""
+    const rawMessage = `Estimado Ing. Sebastián Barrera, he registrado una solicitud de proyecto en su sitio web para el servicio de *${serviceName}*.\n\nMi nombre es *${clientName}*${companyName}. Me pongo en contacto para agilizar el proceso y coordinar los detalles de la sesión inicial.\n\nQuedo atento. Saludos.`
+    const whatsappUrl = `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(rawMessage)}`
 
     return (
       <div style={{
