@@ -21,6 +21,7 @@ export default function ContactForm({ services, preselectedService }: ContactFor
   const [errors, setErrors] = useState<Partial<Record<keyof ContactFormData, string>>>({})
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
   const [serverError, setServerError] = useState("")
+  const [submittedData, setSubmittedData] = useState<{ name: string; service: string } | null>(null)
 
   function validateField(field: keyof ContactFormData) {
     const result = contactSchema.shape[field].safeParse(form[field])
@@ -68,6 +69,7 @@ export default function ContactForm({ services, preselectedService }: ContactFor
     const result = await submitContact(parsed.data)
 
     if (result.success) {
+      setSubmittedData({ name: form.name, service: form.service_interest || "" })
       setStatus("success")
       setForm({ name: "", email: "", company: "", service_interest: "", message: "" })
       setErrors({})
@@ -78,6 +80,14 @@ export default function ContactForm({ services, preselectedService }: ContactFor
   }
 
   if (status === "success") {
+    const whatsappPhone = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "573108356778"
+    const serviceName = submittedData?.service || "tus servicios"
+    const clientName = submittedData?.name || ""
+    const customMessage = encodeURIComponent(
+      `Hola Sebastián, acabo de enviarte una solicitud en tu web para el servicio de "${serviceName}". Mi nombre es ${clientName} y me gustaría agilizar el contacto.`
+    )
+    const whatsappUrl = `https://wa.me/${whatsappPhone}?text=${customMessage}`
+
     return (
       <div style={{
         padding: "2.5rem",
@@ -91,15 +101,53 @@ export default function ContactForm({ services, preselectedService }: ContactFor
           ¡Mensaje enviado!
         </h3>
         <p style={{ color: "var(--lux-muted)", lineHeight: 1.6 }}>
-          Gracias por contactarme. Te responderé en menos de 24 horas.
+          Gracias por contactarme. Te responderé en menos de 24 horas por correo electrónico.
         </p>
-        <button
-          onClick={() => setStatus("idle")}
-          className="lux-submit-btn"
-          style={{ marginTop: 20 }}
-        >
-          Enviar otro mensaje
-        </button>
+        
+        <div style={{ marginTop: 24, display: "grid", gap: 12 }}>
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="lux-submit-btn"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              textDecoration: "none",
+              background: "linear-gradient(135deg, #d8aa5d 0%, #b88d3d 100%)",
+              color: "#000",
+              fontWeight: 600,
+            }}
+          >
+            Chatear por WhatsApp ahora
+          </a>
+          <button
+            onClick={() => {
+              setStatus("idle")
+              setSubmittedData(null)
+            }}
+            style={{
+              background: "transparent",
+              border: "1px solid rgba(216,170,93,0.3)",
+              color: "#d8aa5d",
+              padding: "10px 20px",
+              borderRadius: "8px",
+              fontSize: "0.9rem",
+              cursor: "pointer",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = "rgba(216,170,93,0.08)"
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = "transparent"
+            }}
+          >
+            Enviar otra consulta
+          </button>
+        </div>
       </div>
     )
   }

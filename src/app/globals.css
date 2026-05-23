@@ -1119,6 +1119,70 @@ button { font: inherit; }
   box-shadow: var(--lux-shadow-soft);
 }
 
+/* ── Premium WhatsApp Float Widget ───────────────────────── */
+.ed-whatsapp-float {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 9999px;
+  background: rgba(15, 14, 13, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(216, 170, 93, 0.4);
+  color: var(--lux-gold);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s;
+}
+.ed-whatsapp-float:hover {
+  border-color: rgba(216, 170, 93, 0.8);
+  background: rgba(216, 170, 93, 0.08);
+}
+.ed-whatsapp-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lux-gold-strong);
+}
+.ed-whatsapp-pulse {
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  border: 1px solid rgba(216, 170, 93, 0.5);
+  animation: ed-gold-pulse 2.5s infinite ease-in-out;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes ed-gold-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .ed-whatsapp-float {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    padding: 0.65rem 1rem;
+    font-size: 0.82rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
