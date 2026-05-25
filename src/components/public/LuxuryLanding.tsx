@@ -169,6 +169,35 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 )
 
+const TernaLogo = ({ light = false, height = 24 }: { light?: boolean; height?: number }) => {
+  const textColor = light ? "#141312" : "#f5efe1";
+  return (
+    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, height, userSelect: "none" }}>
+      <svg viewBox="0 0 34 38" style={{ height: "100%", width: "auto" }} fill="none">
+        {/* Left segment */}
+        <rect x="0" y="4" width="10" height="5" fill={textColor} />
+        {/* Center segment (Gold) */}
+        <rect x="12" y="4" width="10" height="5" fill="#d8aa5d" />
+        {/* Right segment */}
+        <rect x="24" y="4" width="10" height="5" fill={textColor} />
+        {/* Vertical Stem */}
+        <rect x="12" y="11" width="10" height="23" fill={textColor} />
+      </svg>
+      <span style={{
+        fontFamily: "var(--font-sans)",
+        fontSize: "1.45rem",
+        fontWeight: 700,
+        color: textColor,
+        letterSpacing: "-0.5px",
+        lineHeight: 1,
+        marginTop: 2
+      }}>
+        erna
+      </span>
+    </div>
+  );
+};
+
 /* ── Types ───────────────────────────────────────────────────── */
 interface Service { id: string; name: string; description: string; price_from: number; icon: string }
 interface LuxuryLandingProps { services: Service[] }
@@ -203,7 +232,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
     { href: "#manifiesto", label: "Manifiesto" },
     { href: "#metodo", label: "Método" },
     { href: "#servicios", label: "Servicios" },
-    { href: "#sobre-mi", label: "Sobre mí" },
+    { href: "#sobre-mi", label: "Nosotros" },
     { href: "#contacto", label: "Contacto" },
   ]
 
@@ -223,8 +252,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
           transition={{ delay: 0.3, ...smoothSpring }}
         >
           <a href="#" className="ed-brand">
-            <span className="ed-brand-mark">SB</span>
-            <strong>Sebastián Barrera</strong>
+            <TernaLogo height={26} />
           </a>
           <div className="ed-desktop-links">
             {navLinks.map(l => (
@@ -475,7 +503,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
                   Ingeniería Química<br /><em>& Inteligencia Operativa.</em>
                 </motion.h2>
                 <motion.p className="ed-about-bio" variants={fadeUp} style={{ maxWidth: 800 }}>
-                  Somos **Katalyst Operations**, una firma de consultoría integrada por ingenieros químicos apasionados por la analítica de datos, el aseguramiento de calidad y la optimización industrial. Combinamos nuestro rigor técnico con herramientas modernas para transformar la operación de tu negocio.
+                  Somos **Terna**, una firma de consultoría integrada por ingenieros químicos apasionados por la analítica de datos, el aseguramiento de calidad y la optimización industrial. Combinamos nuestro rigor técnico con herramientas modernas para transformar la operación de tu negocio.
                 </motion.p>
               </motion.div>
 
@@ -501,7 +529,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
                     <a href="mailto:sebastian11201995@gmail.com" className="ed-team-contact-btn" title="Enviar correo">
                       <Mail size={16} />
                     </a>
-                    <a href="https://wa.me/573108356778?text=Hola%20Sebasti%C3%A1n,%20vi%20tu%20perfil%20en%20Katalyst%20Operations%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
+                    <a href="https://wa.me/573108356778?text=Hola%20Sebasti%C3%A1n,%20vi%20tu%20perfil%20en%20Terna%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
                       <WhatsAppIcon style={{ width: 16, height: 16 }} />
                     </a>
                   </div>
@@ -527,7 +555,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
                     <a href="mailto:danimed240@mail.com" className="ed-team-contact-btn" title="Enviar correo">
                       <Mail size={16} />
                     </a>
-                    <a href="https://wa.me/573112753122?text=Hola%20Danilo,%20vi%20tu%20perfil%20en%20Katalyst%20Operations%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
+                    <a href="https://wa.me/573112753122?text=Hola%20Danilo,%20vi%20tu%20perfil%20en%20Terna%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
                       <WhatsAppIcon style={{ width: 16, height: 16 }} />
                     </a>
                   </div>
@@ -550,7 +578,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
                     <span className="ed-team-skill-badge">BPM</span>
                   </div>
                   <div className="ed-team-contacts">
-                    <a href="https://wa.me/573057882585?text=Hola%20Mar%C3%ADa%20Fernanda,%20vi%20tu%20perfil%20en%20Katalyst%20Operations%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
+                    <a href="https://wa.me/573057882585?text=Hola%20Mar%C3%ADa%20Fernanda,%20vi%20tu%20perfil%20en%20Terna%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
                       <WhatsAppIcon style={{ width: 16, height: 16 }} />
                     </a>
                   </div>
@@ -630,14 +658,11 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
         {/* ── Footer ──────────────────────────────────────────── */}
         <footer className="ed-footer">
           <div className="ed-footer-inner">
-            <div className="ed-footer-brand" style={{ display: "flex", alignItems: "center" }}>
-              <div style={{ position: "relative", width: 44, height: 44, borderRadius: "50%", overflow: "hidden", border: "1.5px solid rgba(216, 170, 93, 0.4)", marginRight: 12 }}>
-                <Image src="/assets/katalyst-logo.png" alt="Katalyst Operations Logo" fill style={{ objectFit: "cover" }} />
-              </div>
-              <div>
-                <strong>Katalyst Operations</strong>
-                <span>Consultoría en Analítica & Calidad de Procesos</span>
-              </div>
+            <div className="ed-footer-brand" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <TernaLogo height={28} />
+              <span style={{ fontSize: "0.85rem", opacity: 0.7, color: "var(--lux-marfil)" }}>
+                Consultoría en Analítica & Calidad de Procesos
+              </span>
             </div>
             <div className="ed-footer-links">
               {navLinks.map(l => (<a key={l.href} href={l.href}>{l.label}</a>))}
@@ -649,7 +674,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
             </div>
           </div>
           <div className="ed-footer-bottom">
-            <p>&copy; {new Date().getFullYear()} Katalyst Operations. Todos los derechos reservados.</p>
+            <p>&copy; {new Date().getFullYear()} Terna. Todos los derechos reservados.</p>
           </div>
         </footer>
 
