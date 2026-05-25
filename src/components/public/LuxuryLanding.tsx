@@ -312,6 +312,9 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
 
             <motion.div className="ed-hero-inner" style={{ y: heroContentY, opacity: heroOpacity }}>
               <motion.div className="ed-hero-content" initial="hidden" animate="visible" variants={stagger}>
+                <motion.div variants={fadeUp} style={{ marginBottom: 16 }}>
+                  <TernaLogo height={32} />
+                </motion.div>
                 <motion.p className="ed-tag" variants={fadeUp}>
                   Analista de datos &bull; Consultor freelance &bull; Bogotá
                 </motion.p>
@@ -499,6 +502,9 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
 
             <div className="ed-about-layout" style={{ display: "block" }}>
               <motion.div className="ed-about-text" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} style={{ width: "100%", maxWidth: "100%", marginBottom: 40 }}>
+                <motion.div variants={fadeUp} style={{ marginBottom: 12 }}>
+                  <TernaLogo height={28} />
+                </motion.div>
                 <motion.h2 className="ed-section-title" variants={fadeUp}>
                   Ingeniería Química<br /><em>& Inteligencia Operativa.</em>
                 </motion.h2>
@@ -555,7 +561,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
                     <a href="mailto:danimed240@mail.com" className="ed-team-contact-btn" title="Enviar correo">
                       <Mail size={16} />
                     </a>
-                    <a href="https://wa.me/573112753122?text=Hola%20Danilo,%20vi%20tu%20perfil%20en%20Terna%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
+                    <a href="https://wa.me/573108356778?text=Hola%20Sebasti%C3%A1n,%20vi%20el%20perfil%20de%20Danilo%20en%20Terna%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
                       <WhatsAppIcon style={{ width: 16, height: 16 }} />
                     </a>
                   </div>
@@ -578,7 +584,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
                     <span className="ed-team-skill-badge">BPM</span>
                   </div>
                   <div className="ed-team-contacts">
-                    <a href="https://wa.me/573057882585?text=Hola%20Mar%C3%ADa%20Fernanda,%20vi%20tu%20perfil%20en%20Terna%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
+                    <a href="https://wa.me/573108356778?text=Hola%20Sebasti%C3%A1n,%20vi%20el%20perfil%20de%20Mar%C3%ADa%20Fernanda%20en%20Terna%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
                       <WhatsAppIcon style={{ width: 16, height: 16 }} />
                     </a>
                   </div>
@@ -594,6 +600,9 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
                 <motion.div className="ed-section-label ed-section-label--light" variants={fadeUp}>
                   <span className="ed-num">05</span>
                   <span className="ed-label-text">Resultados</span>
+                </motion.div>
+                <motion.div variants={fadeUp} style={{ marginBottom: 20 }}>
+                  <TernaLogo height={34} />
                 </motion.div>
 
                 <motion.h2 className="ed-results-title" variants={fadeUp}>
