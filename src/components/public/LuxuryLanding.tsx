@@ -461,41 +461,100 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
             </section>
           </ParallaxBg>
 
-          {/* ═══ 04 SOBRE MÍ ════════════════════════════════════ */}
+          {/* ═══ 04 EL EQUIPO ════════════════════════════════════ */}
           <section id="sobre-mi" className="ed-section ed-about">
             <motion.div className="ed-section-label" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
               <span className="ed-num">04</span>
-              <span className="ed-label-text">Sobre mí</span>
+              <span className="ed-label-text">Nosotros</span>
               <div className="ed-label-line" />
             </motion.div>
 
-            <div className="ed-about-layout">
-              <motion.div className="ed-about-text" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }}>
+            <div className="ed-about-layout" style={{ display: "block" }}>
+              <motion.div className="ed-about-text" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} style={{ width: "100%", maxWidth: "100%", marginBottom: 40 }}>
                 <motion.h2 className="ed-section-title" variants={fadeUp}>
-                  Ingeniero químico<br />con visión de datos.
+                  Ingeniería Química<br /><em>& Inteligencia Operativa.</em>
                 </motion.h2>
-                <motion.p className="ed-about-bio" variants={fadeUp}>
-                  Soy Johan Sebastián Barrera Bustos. Trabajo como coordinador de
-                  laboratorios y me dedico a convertir información cruda en herramientas
-                  que impulsan la toma de decisiones en industria, calidad y operaciones.
+                <motion.p className="ed-about-bio" variants={fadeUp} style={{ maxWidth: 800 }}>
+                  Somos **Katalyst Operations**, una firma de consultoría integrada por ingenieros químicos apasionados por la analítica de datos, el aseguramiento de calidad y la optimización industrial. Combinamos nuestro rigor técnico con herramientas modernas para transformar la operación de tu negocio.
                 </motion.p>
-                <motion.p className="ed-about-bio" variants={fadeUp}>
-                  Experiencia sólida en Power BI, Python, automatización y sistemas de
-                  gestión ISO 9001. Cada proyecto que tomo es una oportunidad de demostrar
-                  que los datos bien usados cambian resultados.
-                </motion.p>
-
-                <motion.div className="ed-stats-row" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
-                  {statsData.map((s, i) => (
-                    <StatCounter key={i} value={s.value} suffix={s.suffix} label={s.label} />
-                  ))}
-                </motion.div>
               </motion.div>
 
-              <motion.div className="ed-about-visual" variants={scaleReveal} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
-                <div className="ed-about-dashboard">
-                  <Image src="/assets/fitness-terrace.png" alt="Estilo de vida profesional" width={800} height={560} style={{ borderRadius: 20 }} />
-                </div>
+              <motion.div className="ed-team-grid" variants={staggerSlow} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }}>
+                {/* Integrante 1: Sebastián */}
+                <motion.div className="ed-team-card" variants={cardReveal}>
+                  <div className="ed-team-avatar-wrap">
+                    <div className="ed-team-avatar">SB</div>
+                  </div>
+                  <h3>Sebastián Barrera</h3>
+                  <div className="ed-team-role">Lead Analyst & Quality Consultant</div>
+                  <p className="ed-team-bio">
+                    Ingeniero Químico con más de 10 años de experiencia integrando análisis de datos en entornos de alta exigencia. Especialista en Power BI, Python, SQL y MATLAB. Lidera el diseño de dashboards ejecutivos, modelos estadísticos y sistemas de gestión de calidad ISO 9001.
+                  </p>
+                  <div className="ed-team-skills">
+                    <span className="ed-team-skill-badge">Power BI</span>
+                    <span className="ed-team-skill-badge">Python</span>
+                    <span className="ed-team-skill-badge">SQL</span>
+                    <span className="ed-team-skill-badge">ISO 9001</span>
+                    <span className="ed-team-skill-badge">MATLAB</span>
+                  </div>
+                  <div className="ed-team-contacts">
+                    <a href="mailto:sebastian11201995@gmail.com" className="ed-team-contact-btn" title="Enviar correo">
+                      <Mail size={16} />
+                    </a>
+                    <a href="https://wa.me/573108356778?text=Hola%20Sebasti%C3%A1n,%20vi%20tu%20perfil%20en%20Katalyst%20Operations%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
+                      <WhatsAppIcon style={{ width: 16, height: 16 }} />
+                    </a>
+                  </div>
+                </motion.div>
+
+                {/* Integrante 2: Danilo */}
+                <motion.div className="ed-team-card" variants={cardReveal}>
+                  <div className="ed-team-avatar-wrap">
+                    <div className="ed-team-avatar">DM</div>
+                  </div>
+                  <h3>Danilo Medina</h3>
+                  <div className="ed-team-role">QA & Metrology Engineer</div>
+                  <p className="ed-team-bio">
+                    Ingeniero Químico con formación en metrología y procesos químicos industriales. Amplia experiencia en control y aseguramiento de calidad en plantas de producción, verificación de materias primas, análisis fisicoquímicos e implementación de Buenas Prácticas de Manufactura (BPM).
+                  </p>
+                  <div className="ed-team-skills">
+                    <span className="ed-team-skill-badge">Metrología</span>
+                    <span className="ed-team-skill-badge">QA Plantas</span>
+                    <span className="ed-team-skill-badge">BPM</span>
+                    <span className="ed-team-skill-badge">Fisicoquímica</span>
+                  </div>
+                  <div className="ed-team-contacts">
+                    <a href="mailto:danimed240@mail.com" className="ed-team-contact-btn" title="Enviar correo">
+                      <Mail size={16} />
+                    </a>
+                    <a href="https://wa.me/573112753122?text=Hola%20Danilo,%20vi%20tu%20perfil%20en%20Katalyst%20Operations%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
+                      <WhatsAppIcon style={{ width: 16, height: 16 }} />
+                    </a>
+                  </div>
+                </motion.div>
+
+                {/* Integrante 3: María Fernanda */}
+                <motion.div className="ed-team-card" variants={cardReveal}>
+                  <div className="ed-team-avatar-wrap">
+                    <div className="ed-team-avatar">MF</div>
+                  </div>
+                  <h3>María Fernanda Fuentes</h3>
+                  <div className="ed-team-role">Biotech & Product Innovation</div>
+                  <p className="ed-team-bio">
+                    Ingeniera Química especializada en procesos microbiológicos e industriales. Experta en diseño y formulación de productos cosméticos de innovación ecofriendly con Análisis de Ciclo de Vida (ACV), trazabilidad de estabilidad, calificación de equipos, calibración, BPM y registros INVIMA.
+                  </p>
+                  <div className="ed-team-skills">
+                    <span className="ed-team-skill-badge">Cosmética</span>
+                    <span className="ed-team-skill-badge">Ciclo de Vida (ACV)</span>
+                    <span className="ed-team-skill-badge">INVIMA</span>
+                    <span className="ed-team-skill-badge">BPM</span>
+                  </div>
+                  <div className="ed-team-contacts">
+                    <a href="https://wa.me/573057882585?text=Hola%20Mar%C3%ADa%20Fernanda,%20vi%20tu%20perfil%20en%20Katalyst%20Operations%20y%20me%20gustar%C3%ADa%20ponerme%20en%20contacto." target="_blank" rel="noopener noreferrer" className="ed-team-contact-btn" title="Chatear por WhatsApp">
+                      <WhatsAppIcon style={{ width: 16, height: 16 }} />
+                    </a>
+                  </div>
+                </motion.div>
               </motion.div>
             </div>
           </section>
@@ -571,11 +630,13 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
         {/* ── Footer ──────────────────────────────────────────── */}
         <footer className="ed-footer">
           <div className="ed-footer-inner">
-            <div className="ed-footer-brand">
-              <span className="ed-brand-mark">SB</span>
+            <div className="ed-footer-brand" style={{ display: "flex", alignItems: "center" }}>
+              <div style={{ position: "relative", width: 44, height: 44, borderRadius: "50%", overflow: "hidden", border: "1.5px solid rgba(216, 170, 93, 0.4)", marginRight: 12 }}>
+                <Image src="/assets/katalyst-logo.png" alt="Katalyst Operations Logo" fill style={{ objectFit: "cover" }} />
+              </div>
               <div>
-                <strong>Sebastián Barrera</strong>
-                <span>Analista de datos & Consultor freelance</span>
+                <strong>Katalyst Operations</strong>
+                <span>Consultoría en Analítica & Calidad de Procesos</span>
               </div>
             </div>
             <div className="ed-footer-links">
@@ -588,7 +649,7 @@ export default function LuxuryLanding({ services }: LuxuryLandingProps) {
             </div>
           </div>
           <div className="ed-footer-bottom">
-            <p>&copy; {new Date().getFullYear()} Johan Sebastián Barrera Bustos. Todos los derechos reservados.</p>
+            <p>&copy; {new Date().getFullYear()} Katalyst Operations. Todos los derechos reservados.</p>
           </div>
         </footer>
 
